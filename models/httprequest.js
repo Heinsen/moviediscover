@@ -8,7 +8,6 @@ function performRequest(host, endpoint, method, data, success) {
   var headers = {};
   if (method == 'GET') {
     endpoint += '?' + querystring.stringify(data);
-    console.log(endpoint);
   }
   else {
     headers = {

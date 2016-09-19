@@ -7,12 +7,15 @@ var model = require('../models/httprequest.js');
 
 
 var host = 'api.themoviedb.org';
-var hostImagePath = 'http://image.tmdb.org/t/p/w300/';
-var hostImageBigPath = 'http://image.tmdb.org/t/p/w500/';
+var hostImagePath = 'http://image.tmdb.org/t/p/w300';
+var hostImageSmallPath = 'http://image.tmdb.org/t/p/w150';
+var hostImageBigPath = 'http://image.tmdb.org/t/p/w500';
 var apiKey = '839dbcdefe33cde7581bc17663eacab8';
 
 // Compile the source code
 const movietemplateCompiledFunction = jade.compileFile('views/partials/movietemplate.jade');
+const casttemplateCompileFunction = jade.compileFile('views/partials/casttemplate.jade');
+const personcredittemplateCompileFunction = jade.compileFile('views/partials/personcredittemplate.jade');
 
 function search(searchInput, callback) {
   model.performRequest(host, '/3/search/movie', 'GET', {
@@ -47,31 +50,109 @@ function search(searchInput, callback) {
 }
 
 function titleLookup(titleId, callback) {
-   console.log(titleId);
-   model.performRequest(host, '/3/movie/' + titleId, 'GET', {
+ model.performRequest(host, '/3/movie/' + titleId, 'GET', {
+  api_key: apiKey
+}, function(data) {
+
+  posterPath = hostImageBigPath + data.poster_path + '?api_key=' + apiKey;
+
+  var movieResult = {
+    original_title: data.original_title,
+    overview: data.overview,
+    release_date: data.release_date,
+    runtime: data.runtime,
+    tagline: data.tagline,
+    vote_average: data.vote_average,
+    poster_path: hostImageBigPath + data.poster_path + '?api_key=' + apiKey
+
+  }
+
+  console.log(data);
+
+  callback(movieResult, data.original_title);
+});
+}
+
+function creditLookup(titleId, callback) {
+  model.performRequest(host, '/3/movie/' + titleId + '/credits', 'GET', {
     api_key: apiKey
   }, function(data) {
-    
-    posterPath = hostImageBigPath + data.poster_path + '?api_key=' + apiKey;
+    const castData = data.cast;
+    var castDiv = '';
 
-    var movieResult = {
-      original_title: data.original_title,
-      overview: data.overview,
-      release_date: data.release_date,
-      runtime: data.runtime,
-      tagline: data.tagline,
-      vote_average: data.vote_average,
-      poster_path: hostImageBigPath + data.poster_path + '?api_key=' + apiKey
-
+    var nCastMembers = 5;
+    if(castData.length < nCastMembers) {
+      nCastMembers = castData.length;
     }
 
-    console.log(movieResult);
+    for (index = 0; index < nCastMembers; ++index) {
+      var currentCastPerson = castData[index];
 
-    callback(movieResult);
+      castImagePath = hostImageSmallPath + currentCastPerson.profile_path + '?api_key=' + apiKey;
+
+      castDiv += casttemplateCompileFunction({
+        character_name: currentCastPerson.character,
+        id: currentCastPerson.id,
+        name: currentCastPerson.name,
+        cast_image: castImagePath
+      });
+    }
+
+    console.log(castDiv);
+
+    callback(castDiv);
+  });
+}
+
+function personLookup(personId, callback) {
+  model.performRequest(host, '/3/person/' + personId, 'GET', {
+    api_key: apiKey
+  }, function(data) {
+    const personData = data;
+    
+    var personObject = {
+      id: data.id,
+      name: data.name,
+      biography: data.biography,
+      image: hostImageBigPath + data.profile_path + '?api_key=' + apiKey
+    }
+
+    console.log(data);
+
+    callback(personObject);
+  });
+}
+
+function personCreditLookup(personId, callback) {
+ console.log('person');
+ model.performRequest(host, '/3/person/' + personId + '/movie_credits', 'GET', {
+    api_key: apiKey
+  }, function(data) {
+    const personCreditData = data.cast;
+    var personCreditDiv = '';
+
+    for (index = 0; index < personCreditData.length; ++index) {
+      var currentCredit = personCreditData[index];
+
+      posterPath = hostImageSmallPath + currentCredit.poster_path + '?api_key=' + apiKey;
+
+      personCreditDiv += personcredittemplateCompileFunction({
+        original_title: currentCredit.original_title,
+        release_date: currentCredit.release_date,
+        character_name: currentCredit.character,
+        title_id: currentCredit.id,
+        title_poster: posterPath
+      });
+    }
+
+    callback(personCreditDiv);
   });
 }
 
 module.exports = {
-  search : search,
-  titleLookup : titleLookup
+ search : search,
+ titleLookup : titleLookup,
+ creditLookup : creditLookup,
+ personLookup : personLookup,
+ personCreditLookup : personCreditLookup
 }

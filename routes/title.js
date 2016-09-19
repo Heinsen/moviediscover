@@ -11,44 +11,50 @@ var youttubeVideoFetched = false;
 var youtubeVideoDivContent = '';
 var youtubeIFrameDivContent = '';
 
-var titlelookupDone = false;
-var titlelookupDivContent = '';
+var titlelookupDone, castlookupDone = false;
+var titlelookupDivContent, castlookupDivContent = '';
 
 router.get('/', function(req, res, next) {
   youttubeVideoFetched = false;
-  titlelookupDone = false;
+  titlelookupDone, castlookupDone = false;
 
   movieSearchInput = req.query.movieSearchInput;
   titleId = req.query.titleId;
 
-  model.titleLookup(req.query.titleId, function(movieDivContent) {
+  model.titleLookup(req.query.titleId, function(movieDivContent, movieTitle) {
+    youtubeTralierLookup(movieTitle, res);
+
     titlelookupDone = true;
     titlelookupDivContent = movieDivContent;
+    // renderPage(res);
+  });
+
+  model.creditLookup(req.query.titleId, function(castDivContent) {
+    castlookupDone = true;
+    castlookupDivContent = castDivContent;
     renderPage(res);
   });
 
-  youtubeModel.search(req.query.movieSearchInput, function(youtubeDivContent, iframDivContent) {
+});
+
+function youtubeTralierLookup(title, res) {
+  youtubeModel.search(title + ' trailer', function(youtubeDivContent, iframDivContent) {
     youttubeVideoFetched = true;
     youtubeVideoDivContent = youtubeDivContent;
     youtubeIFrameDivContent = iframDivContent;
     renderPage(res);
   });
-
-  wikiModel.searchWikipedia('Matt Damon', function(wikiDivContent) {
-    
-    
-  });
-
-});
+}
 
 function renderPage(res) {
 
-  if(youttubeVideoFetched == true && titlelookupDone == true) {
+  if(youttubeVideoFetched == true && titlelookupDone == true && castlookupDone == true) {
     res.render('title', { 
       title: 'Movie Discover', 
       movieSearchInput: movieSearchInput, 
       titleId: titleId,
       titleData: titlelookupDivContent,
+      castData: castlookupDivContent,
       selectedVideo: youtubeIFrameDivContent,
       youtubeData: youtubeVideoDivContent 
     });

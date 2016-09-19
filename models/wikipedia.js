@@ -13,17 +13,11 @@ function search(searchInput, callback) {
     exintro: '1',
     explaintext: '1',
     indexpageids: '1',
-    titles: 'Johnny Depp'
+    titles: searchInput
   }, function(data) {
   	
-  	var wikiResults = data.query;
-	var wikiResultsDiv = '';
-    
-    console.log(data);
-    console.log(wikiResults.pages[wikiResults.pageids[0]].extract);
-
-    
-    callback(wikiResults);
+    var wikiResults = data.query;
+    callback(wikiResults.pages[wikiResults.pageids[0]].extract);
   });
 }
 

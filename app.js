@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var title = require('./routes/title');
-
+var person = require('./routes/person');
 
 var app = express();
 
@@ -27,6 +27,7 @@ app.use('/jquery', express.static(path.join(__dirname,'./node_modules/jquery/dis
 
 app.use('/', routes);
 app.use('/title', title);
+app.use('/person', person);
 
 
 // catch 404 and forward to error handler
