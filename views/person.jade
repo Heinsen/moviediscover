@@ -4,10 +4,10 @@ block content
 	include partials/searchform
 	.row(id='title')
 		.col-md-8
-			.col-md-8.col-md-offset-2#person_title #{tmdb.name}
 			.row(id='tmdb.name')
 				.col-md-5
 					img(class='col-md-12 img-responsive', src='#{tmdb.image}')
+				.col-md-7#person_title #{tmdb.name}
 				.col-md-7
 					div() Wikipedia
 						.person_biography #{wikipedia}

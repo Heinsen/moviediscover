@@ -43,7 +43,6 @@ function search(searchInput, callback) {
        original_title: currentMovie.original_title,
        vote_average: currentMovie.vote_average
      });
-      // console.log(movieResults);
     }
     callback(searchReusltDiv);
   });
@@ -66,8 +65,6 @@ function titleLookup(titleId, callback) {
     poster_path: hostImageBigPath + data.poster_path + '?api_key=' + apiKey
 
   }
-
-  console.log(data);
 
   callback(movieResult, data.original_title);
 });
@@ -98,8 +95,6 @@ function creditLookup(titleId, callback) {
       });
     }
 
-    console.log(castDiv);
-
     callback(castDiv);
   });
 }
@@ -117,14 +112,11 @@ function personLookup(personId, callback) {
       image: hostImageBigPath + data.profile_path + '?api_key=' + apiKey
     }
 
-    console.log(data);
-
     callback(personObject);
   });
 }
 
 function personCreditLookup(personId, callback) {
- console.log('person');
  model.performRequest(host, '/3/person/' + personId + '/movie_credits', 'GET', {
     api_key: apiKey
   }, function(data) {

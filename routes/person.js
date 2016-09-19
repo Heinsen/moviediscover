@@ -4,8 +4,7 @@ var model = require('../models/tmdb.js')
 var youtubeModel = require('../models/youtube.js')
 const wikiModel = require('../models/wikipedia.js')
 
-var movieSearchInput = '';
-var personId = '';
+var movieSearchInput;
 
 var personCreditDivContent, youtubeVideoDivContent, youtubeIFrameDivContent = '';
 
@@ -16,7 +15,7 @@ var tmdbPersonObject, wikipediaObject;
 
 router.get('/', function(req, res, next) {
   personCreditDivFetched, youttubeVideoFetched, wikipedialookupDone = false;
-
+  personCreditDivContent, youtubeVideoDivContent, youtubeIFrameDivContent = '';
   movieSearchInput = req.query.movieSearchInput;
   personId = req.query.personId;
 
@@ -26,14 +25,12 @@ router.get('/', function(req, res, next) {
     youtubePersonLookup(personObject.name, res);
     personMovieCredits(personObject.id, res);
   });
-
 });
 
 function wikipediaPersonLookup(personName, res) {
   wikiModel.searchWikipedia(personName, function(wikipedia) {
     wikipedialookupDone = true;
     wikipediaObject = wikipedia;
-    console.log(wikipediaObject);
     renderPage(res);
   });
 }
@@ -67,6 +64,10 @@ function renderPage(res) {
       youtubeData: youtubeVideoDivContent
     });
   }
+}
+
+function renderIndexPage(res) {
+  res.render('index', { title: 'Movie Discover', movieSearchInput: '' });
 }
 
 module.exports = router;
