@@ -1,0 +1,27 @@
+extends layout
+
+block content
+	include partials/searchform
+	.row(id='title')
+		.col-md-8
+			.col-md-5
+				img(class='col-md-12 img-responsive', src='#{titleData.poster_path}')
+			.col-md-7
+				div(id='title_title') #{titleData.original_title}
+				div(id='title_tagline') ##{titleData.tagline}
+				div(id='title_overview') #{titleData.overview}
+				div(id='title_release_date') Released #{titleData.release_date}
+				div(id='title_runtime') Runtime #{titleData.runtime} minutes
+				div(id='title_vote_average') 
+					div() 
+						img(class='col-md-1 img-responsive' src='/images/tmdb_logo.png')
+						div #{titleData.vote_average}
+			.col-md-12
+				#iframediv
+					!{selectedVideo}
+		table(class='col-md-3')
+			tbody
+				!{youtubeData}
+		
+block scripts
+	script(src='/javascripts/public_title.js')

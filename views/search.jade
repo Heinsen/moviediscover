@@ -1,0 +1,10 @@
+extends layout
+
+block content
+	include partials/searchform
+	table(class='table table-striped col-md-4')
+		tbody
+			!{searchResults}
+
+block scripts
+	script(src='/javascripts/public_search.js')
